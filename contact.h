@@ -2,22 +2,14 @@
 #ifndef __CONTACT__
 #define __CONTACT__
 
-#include <iostream>
-#include <string>
-#include <stdio.h>
-#include <fstream>
-#include <conio.h>
-#include  <cstdlib>
-#include <vector>
-#include <thread>
-#include <iomanip>
+#include "base.h"
 
-using namespace std;
-
-struct contac {
+struct contac 
+{
 	long long number = EOF;
 	string name;
 };
+
 
 
 

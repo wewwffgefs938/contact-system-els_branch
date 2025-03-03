@@ -3,13 +3,51 @@
 
 
 
+
+#include "account.h"
 #include "contact.h"
 
 void put_data(fstream& push,vector<contac>& data);
 
 void push_data(fstream& put, vector<contac>& data);
 
+
+bool auto_login_state = false;
+bool saving_password_state = false;
+
+
+
 int main() {
+
+	cout << "welcome to this system" << setw(2) << system_name << version << endl;
+
+	
+
+	string account_state_file_path = "account_state.txt";
+
+	fstream ac_s(account_state_file_path, ios::in | ios::out);//打开账户状态管理文件
+
+	vector<account>account_list;
+
+	if (account_state_file_check(account_state_file_path))
+	{
+		ac_s.seekg(0, ios::beg);//重置指针pos
+		ac_s >> auto_login_state >> saving_password_state;//载入状态
+
+		if (auto_login_state)
+		{
+
+		}
+	}
+	else
+	{
+		account_method_choice();
+	}
+	
+
+
+
+	//while()
 
 
 	bool exit = false;
@@ -33,12 +71,10 @@ int main() {
 
 	put_data(file,con_data);
 
-	
-
 	while (!exit) {
 		
 		contact_menu();
-		if (contact_menu_port(con_data, file, exit)) {
+		if (contact_menu_port(con_data,file,exit)){
 			system("cls");
 			continue;
 		}
