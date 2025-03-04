@@ -2,8 +2,6 @@
 #ifdef EXCLUDE_FILE
 
 
-
-
 #include "account.h"
 #include "contact.h"
 
@@ -11,11 +9,7 @@ void put_data(fstream& push,vector<contac>& data);
 
 void push_data(fstream& put, vector<contac>& data);
 
-
-bool auto_login_state = false;
-bool saving_password_state = false;
-
-
+ac_t ac_state;
 
 int main() {
 
@@ -27,27 +21,46 @@ int main() {
 
 	fstream ac_s(account_state_file_path, ios::in | ios::out);//打开账户状态管理文件
 
-	vector<account>account_list;
-
 	if (account_state_file_check(account_state_file_path))
 	{
-		ac_s.seekg(0, ios::beg);//重置指针pos
-		ac_s >> auto_login_state >> saving_password_state;//载入状态
-
-		if (auto_login_state)
+		while (true)
 		{
+			ac_s.seekg(0, ios::beg);//重置指针pos
+			ac_s >>  ac_state.auto_login_state >> ac_state.saving_password_state;//载入状态
 
+			if (ac_state.auto_login_state)//如果是自动登录
+			{
+				cout << "自动登录成功" << endl;
+				system("pasue");
+				break;
+			}
+			else
+			{
+				if (account_method_choice(ac_state))
+					break;
+			}
 		}
+		
 	}
 	else
 	{
-		account_method_choice();
+		ofstream new_ac_s (account_state_file_path);
+		if (!new_ac_s.is_open())
+		{
+			cerr << "账号管理文件无法正常生成" << endl;
+		}
+		else
+		{
+			cout << "文件生成成功" << endl;
+		}
+		new_ac_s.close();
+		bool pd = account_method_choice(ac_state);
+		login_state_push(ac_state);
+
 	}
-	
 
-
-
-	//while()
+	ac_s.close();
+	login_state_push(ac_state);
 
 
 	bool exit = false;
@@ -90,7 +103,6 @@ int main() {
 	
 	file.close();
 
-
 	return 0;
 
 }
@@ -106,13 +118,7 @@ void put_data(fstream& push,vector<contac>& data) {
 			cout << "file read error" << endl;
 			break;
 		}
-
-		
-
 		data.push_back(temp);//save data
-
-
-		
 	}
 }
 

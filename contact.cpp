@@ -7,6 +7,7 @@ void fun3_delete_contacts(vector<contac>& condata);
 void fun4_find_contacts(vector<contac>& condata);
 void fun5_revise_contacts(vector<contac>& condata);
 void fun6_empty_all_contacts(vector<contac>& condata);
+void fun7_login_sitting();
 void fun0_go_down_system(bool &exit);
 
 void back_menu(bool & back);
@@ -19,6 +20,7 @@ void contact_menu() {
 		<< "*****" << "4.查找联系人" << "*****" << endl
 		<< "*****" << "5.修改联系人" << "*****" << endl
 		<< "*****" << "6.清空通讯录" << "*****" << endl
+		<< "*****" << "7.登录设置" << "*****" << endl
 		<< "*****" << "0.退出系统  " << "*****" << endl
 		<< " ********************" << endl;
 }
@@ -103,6 +105,9 @@ bool contact_menu_port(vector<contac>& condata,fstream& file,bool& exit) {
 		}
 		if(commit)
 			fun6_empty_all_contacts(condata);
+		break;
+	case '7':
+		fun7_login_sitting();
 		break;
 	case '0':
 		back_menu(back);
@@ -352,6 +357,10 @@ void fun6_empty_all_contacts(vector<contac>& condata) {
 		condata = tempback;
 	else
 		return;
+}
+void fun7_login_sitting()
+{
+
 }
 void fun0_go_down_system(bool& exit) {
 	char getmake;

@@ -15,7 +15,7 @@
 using namespace std;
 
 
-const int version = 1.02;
+const int version = 1.01;
 const string system_name = "contact-saver";
 
 
