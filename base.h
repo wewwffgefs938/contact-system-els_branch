@@ -14,6 +14,30 @@
 
 using namespace std;
 
+class Logger {
+public:
+    // 构造函数
+    Logger(const std::string& filename) : originalBuffer(nullptr) {
+        logFile.open(filename, std::ios::out | std::ios::app); // 追加模式，确保日志不会被覆盖
+        if (!logFile.is_open()) {
+            std::cerr << "无法打开日志文件！" << std::endl;
+            return;
+        }
+        originalBuffer = std::cerr.rdbuf(logFile.rdbuf()); // 重定向 cerr
+    }
+
+    ~Logger() {
+        if (logFile.is_open()) {
+            std::cerr.rdbuf(originalBuffer); // 恢复原始 cerr
+            logFile.close();
+        }
+    }
+
+private:
+    std::ofstream logFile;
+    std::streambuf* originalBuffer;
+};
+
 
 const int version = 1.01;
 const string system_name = "contact-saver";

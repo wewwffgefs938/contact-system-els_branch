@@ -3,6 +3,7 @@
 #define __CONTACT__
 
 #include "base.h"
+#include "account.h"
 
 struct contac 
 {
@@ -15,6 +16,6 @@ struct contac
 
 void contact_menu();
 
-bool contact_menu_port(vector<contac>&condata,fstream& file,bool& exit);
+bool contact_menu_port(vector<contac>&condata,fstream& file,bool& exit,ac_t & account_state);
 
 #endif

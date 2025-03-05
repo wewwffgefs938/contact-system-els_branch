@@ -14,12 +14,12 @@ void login_state_push(ac_t& ac_state, fstream& input_file)//写入账号管理配置
 	if (!input_file.is_open())
 	{
 		fstream ac_s("account_state.txt", ios::in | ios::out);
-		ac_s << ac_state.auto_login_state << " " << ac_state.saving_password_state << endl;
+		ac_s << ac_state.auto_login_state << " " << ac_state.saving_password_state <<" "<<ac_state.account_name<<" "<<ac_state.account_password;
 		ac_s.close();
 	}
 	else
 	{
-		input_file << ac_state.auto_login_state << " " << ac_state.saving_password_state << endl;
+		input_file << ac_state.auto_login_state << " " <<ac_state.saving_password_state <<" "<<ac_state.account_name<<" "<<ac_state.account_password;
 	}
 }
 
@@ -35,10 +35,6 @@ bool account_state_file_check(const string& data_file_path)
 
 	ac_state.close();
 	return 0 != file_size;
-}
-void login_state()
-{
-
 }
 
 void part2(string & pass_word,size_t & pos)
@@ -60,6 +56,14 @@ void part2(string & pass_word,size_t & pos)
 		part2(pass_word,pos);
 		return;
 	}
+}
+
+void show_password(ac_t & account_state)
+{
+	if (account_state.account_password != "\n")
+		cout << account_state.account_password;
+	else
+		cout << "无密码" << endl;
 }
 
 void create_account()
@@ -140,26 +144,64 @@ bool check_ac_p(const vector<account> & ac_list,string & password,string ac_name
 }
 
 
-bool login(ac_t & ac_state)
+bool login(ac_t& ac_state)
 {
-	ifstream ac ("account.txt");
+	ifstream ac("account.txt");
 	vector<account>account_list;
 	account temp;
-	char temp_input;
+	bool saving_password_using = true;//是否要启动保存密码的输入
 	while (true)
 	{
 		if (ac.eof())
 			break;
 		if (ac.fail())
 			break;
-		ac >> temp.ac_name >>temp.pass_word;
+		ac >> temp.ac_name >> temp.pass_word;
 		account_list.push_back(temp);
 	}
 	string input_account_name, intput_password;
-	cout << "输入账号:" << endl;
-	getline(cin, input_account_name);
-	cout << "输入密码:" << endl;
-	getline(cin, intput_password);
+	if (ac_state.account_name == "NULL")
+	{
+		cout << "输入账号:" << endl;
+		getline(cin, input_account_name);
+	}
+	else
+	{
+		input_account_name = ac_state.account_name;
+		cout << "当前账号:" << setw(2) << ac_state.account_name<< endl;
+		cout << "是否要切换账号Y/N" << endl;
+		switch (_getch())
+		{
+		case 'Y':
+		case'y':
+			saving_password_using = false;
+			cout << "输入账号:" << endl;
+			getline(cin, input_account_name);
+			break;
+		default:
+			break;
+		}
+		
+	}
+	ac_state.account_name = input_account_name;
+	if (!ac_state.saving_password_state || !saving_password_using)
+	{
+		cout << "输入密码:" << endl;
+		getline(cin, intput_password);
+	}
+	else
+	{
+		cout << "确认使用此密码Y/N" << endl;
+		switch (_getch())
+		{
+		case 'Y':
+		case'y':
+			intput_password = ac_state.account_password;
+		default:
+			break;
+		}
+
+	}
 	cout << "是否设置下次自动登录Y/N" << endl;
 	switch (_getch())
 	{
@@ -180,8 +222,11 @@ bool login(ac_t & ac_state)
 		case'Y':
 		case'y':
 			ac_state.saving_password_state = true;
+			ac_state.account_password = intput_password;
+			break;
 		case'N':
 		case'n':
+			ac_state.saving_password_state = false;
 			break;
 		default:
 			break;

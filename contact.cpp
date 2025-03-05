@@ -1,4 +1,5 @@
 #include "contact.h"
+#include "account.h"
 
 
 void fun1_add_contacts(vector<contac>& condata);
@@ -7,10 +8,42 @@ void fun3_delete_contacts(vector<contac>& condata);
 void fun4_find_contacts(vector<contac>& condata);
 void fun5_revise_contacts(vector<contac>& condata);
 void fun6_empty_all_contacts(vector<contac>& condata);
-void fun7_login_sitting();
+void fun7_login_sitting(ac_t& account_state);
 void fun0_go_down_system(bool &exit);
 
 void back_menu(bool & back);
+
+
+bool switch_yes_or_no()
+{
+	switch (_getch())
+	{
+	case 'Y':
+	case'y':
+		return true;
+	default:
+		break;
+	}
+	return false;
+}
+
+const string account_satate_on_off_print(ac_t& account_state,int method = 0)//1 to auto_login_state, 2 to saving password state
+{
+	if (1 == method)
+	{
+		if (account_state.auto_login_state)
+			return "(开启)";
+		else
+			return "(关闭)";
+	}
+	else if (2 == method)
+	{
+		if (account_state.saving_password_state)
+			return"(开启)";
+		else
+			return"(关闭)";
+	}
+}
 
 void contact_menu() {
 	cout << " ********************" << endl
@@ -20,111 +53,136 @@ void contact_menu() {
 		<< "*****" << "4.查找联系人" << "*****" << endl
 		<< "*****" << "5.修改联系人" << "*****" << endl
 		<< "*****" << "6.清空通讯录" << "*****" << endl
-		<< "*****" << "7.登录设置" << "*****" << endl
-		<< "*****" << "0.退出系统  " << "*****" << endl
+		<< "*****" << " 7.登录设置 " << "*****" << endl
+		<< "*****" << " 0.退出系统 " << "*****" << endl
 		<< " ********************" << endl;
 }
 
-bool contact_menu_port(vector<contac>& condata,fstream& file,bool& exit) {
-	file.seekg(0, ios::beg);//相对于文件开头将文件指针移动到0的位置
+
+void login_setting_menu(ac_t & account_state)
+{
+	cout << "当前账号：" << setw(2) << account_state.account_name << endl;
+	cout << "密码:" << setw(2);
+	for (int i = 0; i < account_state.account_password.size(); i++) cout << '*';
+	cout << endl;
+	cout << "************************" << endl
+		<< "****" << "1.自动登录" << account_satate_on_off_print(account_state, 1) << "****" << endl
+		<< "****" << "2.保留密码" << account_satate_on_off_print(account_state, 2) << "****" << endl
+		<< "****" << "  3.显示密码  " << "****" << endl
+		<< "****" << "  4.退出设置  " << "****" << endl
+		<< "************************" << endl;
+
+}
+
+bool contact_menu_port(vector<contac>& condata,fstream& file,bool& exit,ac_t & account_state) {
 	bool back = false;
-	bool commit = false;
-	cout << "请按下你的选择" << endl;
-	switch (_getch())
+	bool menu_break = false;
+	while (true)
 	{
-	case '1':
-		back_menu(back);
-		if (back) {
-			break;
-		}
-			
-		fun1_add_contacts(condata);
-		break;
-	case '2':
-		back_menu(back);
-		if (back) {
-			break;
-		}
-
-		fun2_show_contacts(condata);
-		break;
-	case '3':
-		back_menu(back);
-		if (back) {
-			break;
-		}
-		if (!condata.size())
-			cout << "你个社恐一个联系人都没有，你删牛魔呢" << endl;
-		else
-			fun3_delete_contacts(condata);
-		break;
-	case '4':
-		back_menu(back);
-		if (back) {
-			break;
-		}
-		if (!condata.size())
-			cout << "你个社恐一个联系人都没有，你找牛魔呢" << endl;
-		else
-			fun4_find_contacts(condata);
-		break;
-	case '5':
-		back_menu(back);
-		if (back) {
-			break;
-		}
-
-		fun5_revise_contacts(condata);
-		break;
-	case '6':
-		back_menu(back);
-		if (back) {
-			break;
-		}
-		cout << "真的要清空整个通讯录吗？Y/N" << endl;
+		system("cls");
+		contact_menu();
+		back = false;
+		file.seekg(0, ios::beg);//相对于文件开头将文件指针移动到0的位置
+		bool commit = false;
+		cout << "请按下你的选择" << endl;
 		switch (_getch())
 		{
-		case 'Y':
-		case'y':
-			commit = true;
+		case '1':
+			back_menu(back);
+			if (back) {
+				break;
+			}
+
+			fun1_add_contacts(condata);
 			break;
-		default:
+		case '2':
+			back_menu(back);
+			if (back) {
+				break;
+			}
+
+			fun2_show_contacts(condata);
 			break;
-		}
-		if (commit) {
-			cout << "要不要再想想呢？Y/N" << endl;
+		case '3':
+			back_menu(back);
+			if (back) {
+				break;
+			}
+			if (!condata.size())
+				cout << "你个社恐一个联系人都没有，你删牛魔呢" << endl;
+			else
+				fun3_delete_contacts(condata);
+			break;
+		case '4':
+			back_menu(back);
+			if (back) {
+				break;
+			}
+			if (!condata.size())
+				cout << "你个社恐一个联系人都没有，你找牛魔呢" << endl;
+			else
+				fun4_find_contacts(condata);
+			break;
+		case '5':
+			back_menu(back);
+			if (back) {
+				break;
+			}
+
+			fun5_revise_contacts(condata);
+			break;
+		case '6':
+			back_menu(back);
+			if (back) {
+				break;
+			}
+			cout << "真的要清空整个通讯录吗？Y/N" << endl;
 			switch (_getch())
 			{
 			case 'Y':
 			case'y':
-				commit = false;
+				commit = true;
 				break;
 			default:
 				break;
 			}
-		}
-		if(commit)
-			fun6_empty_all_contacts(condata);
-		break;
-	case '7':
-		fun7_login_sitting();
-		break;
-	case '0':
-		back_menu(back);
-		if (back) {
+			if (commit) {
+				cout << "要不要再想想呢？Y/N" << endl;
+				switch (_getch())
+				{
+				case 'Y':
+				case'y':
+					commit = false;
+					break;
+				default:
+					break;
+				}
+			}
+			if (commit)
+				fun6_empty_all_contacts(condata);
+			break;
+		case '7':
+			fun7_login_sitting(account_state);
+			break;
+		case '0':
+			back_menu(back);
+			if (back) {
+				break;
+			}
+			fun0_go_down_system(exit);
+			menu_break = true;
+			break;
+		default:
+			cout << "输入错误喵" << "请重新输入" << endl;
+			system("pause");
+			continue;
 			break;
 		}
-
-		fun0_go_down_system(exit);
-		break;
-	default:
-		cout << "输入错误喵" << "请重新输入" << endl;
-		contact_menu_port(condata, file, exit);
-		break;
+		if (menu_break)
+			break;
+		system("pause");
 	}
-
 	return back;
-
 }
 
 
@@ -358,14 +416,51 @@ void fun6_empty_all_contacts(vector<contac>& condata) {
 	else
 		return;
 }
-void fun7_login_sitting()
-{
 
+void fun7_login_sitting(ac_t & account_state)
+{
+	bool get_down = false;
+	while (true)
+	{
+		login_setting_menu(account_state);
+		switch (_getch())
+		{
+		case'1':
+			cout << "(开启/关闭)自动登录-(Y/N)" << endl;
+			if (switch_yes_or_no())
+				account_state.auto_login_state = true;
+			else
+				account_state.auto_login_state = false;
+			break;
+		case'2':
+			cout << "(开启/关闭)保留密码-(Y/N)" << endl;
+			if (switch_yes_or_no())
+				account_state.saving_password_state = true;
+			else
+				account_state.saving_password_state = false;
+			break;
+		case'3':
+			show_password(account_state);
+			break;
+		case'4':
+			cout << "退出账号设置" << endl;
+			get_down = true;
+			break;
+		default:
+			system("cls");
+			cout << "输入错误" << endl;
+			continue;
+			break;
+		}
+		if (get_down)
+			break;
+		system("pause");
+		system("cls");
+	}
 }
 void fun0_go_down_system(bool& exit) {
 	char getmake;
 	cout << "请确认退出操作，是:Y/N" << endl;
-	cin.ignore();
 	getmake = getchar();
 	if (getmake == 'Y' || getmake == 'y')
 		exit = true;

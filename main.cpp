@@ -13,9 +13,9 @@ ac_t ac_state;
 
 int main() {
 
-	cout << "welcome to this system" << setw(2) << system_name << version << endl;
+	Logger error_write("log.txt");
 
-	
+	cout << "welcome to this system" << setw(2) << system_name << version << endl;
 
 	string account_state_file_path = "account_state.txt";
 
@@ -26,12 +26,12 @@ int main() {
 		while (true)
 		{
 			ac_s.seekg(0, ios::beg);//重置指针pos
-			ac_s >>  ac_state.auto_login_state >> ac_state.saving_password_state;//载入状态
+			ac_s >>  ac_state.auto_login_state >> ac_state.saving_password_state >> ac_state.account_name >>ac_state.account_password;//载入状态
 
 			if (ac_state.auto_login_state)//如果是自动登录
 			{
 				cout << "自动登录成功" << endl;
-				system("pasue");
+				system("pause");
 				break;
 			}
 			else
@@ -39,6 +39,7 @@ int main() {
 				if (account_method_choice(ac_state))
 					break;
 			}
+			
 		}
 		
 	}
@@ -54,8 +55,7 @@ int main() {
 			cout << "文件生成成功" << endl;
 		}
 		new_ac_s.close();
-		bool pd = account_method_choice(ac_state);
-		login_state_push(ac_state);
+		account_method_choice(ac_state);
 
 	}
 
@@ -67,27 +67,40 @@ int main() {
 
 	vector<contac>con_data;
 
-	fstream file("contact_data.txt", ios::in | ios::out);
-
+	fstream file(ac_state.account_name+"contact_data.txt", ios::in | ios::out);
 
 	if (!file.is_open()) {
-		cout << "????????????????????------" << endl;
+		cerr << "配置文件缺失" <<"at line"<< __LINE__ << endl;
 		this_thread::sleep_for(chrono::microseconds(1500));
 		cout << "-------------------------" << endl;
 		this_thread::sleep_for(chrono::microseconds(500));
-		cout << "????-";
-		if (file._Nocreate)
-			cout << "???" << endl;
+		cout << "尝试创建文件";
+		ofstream create_file (ac_state.account_name + "contact_data.txt");
+		if (!create_file.is_open())
+		{
+			cerr << "配置文件创建错误" << endl;
+			cerr << "系统异常退出" << endl;
+			return 1;
+		}
 		else
-			cout << "???" << endl;
+		{
+			cout << "user_contact_data配置文件创建成功" << endl;
+			fstream file(ac_state.account_name + "contact_data.txt", ios::in | ios::out);
+			if (!file.is_open())
+			{
+				cerr << "配置文件读取异常" << endl;
+				cerr << "退出系统" << endl;
+				return 1;
+			}
+		}
+		create_file.close();
 	}
 
 	put_data(file,con_data);
 
 	while (!exit) {
 		
-		contact_menu();
-		if (contact_menu_port(con_data,file,exit)){
+		if (contact_menu_port(con_data,file,exit,ac_state)){
 			system("cls");
 			continue;
 		}
@@ -100,9 +113,9 @@ int main() {
 		system("cls");
 	}
 
-	
+	login_state_push(ac_state);
 	file.close();
-
+	std::cerr.flush();
 	return 0;
 
 }
