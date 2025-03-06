@@ -5,7 +5,8 @@ void account_menu()
 	cout << " **************" << endl
 		<< "*****" << "1.µÇÂ¼" << "*****" << endl
 		<< "*****" << "2.×¢²á" << "*****" << endl
-		<< "*****" << "3.ÍË³ö" << "*****" << endl
+		<< "***" << "3.ÀëÏßµÇÂ¼" <<"***" << endl
+		<< "*****" << "4.ÍË³ö" << "*****" << endl
 		<< " **************" << endl;
 }
 
@@ -116,6 +117,13 @@ bool account_method_choice(ac_t& ac_state)
 			create_account();
 			break;
 		case'3':
+			ac_state.account_name = "offine_log";
+			ac_state.account_password = "offine_log";
+			ac_state.auto_login_state = false;
+			ac_state.saving_password_state = false;
+			return true;
+			break;
+		case'4':
 			return false;
 			break;
 		default:
@@ -216,7 +224,7 @@ bool login(ac_t& ac_state)
 	}
 	if (!ac_state.auto_login_state)
 	{
-		cout << "ÊÇ·ñÒª±£´æÃÜÂë" << endl;
+		cout << "ÊÇ·ñÒª±£´æÃÜÂëY/N" << endl;
 		switch (_getch())
 		{
 		case'Y':

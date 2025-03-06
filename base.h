@@ -39,8 +39,9 @@ private:
 };
 
 
-const int version = 1.01;
+const string version = "1.04";
 const string system_name = "contact-saver";
+const string coder = "by__NSC_Group_9";
 
 
 #endif // !__BASE__

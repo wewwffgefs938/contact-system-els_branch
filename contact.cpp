@@ -223,9 +223,9 @@ void fun2_show_contacts(vector<contac>& condata) {
 	int contacter_cout = 1;
 
 	if (condata.size()) {
-		cout<< "line_num"<<setw(17)<< "电话号码" << setw(9) << "姓名" << endl;
+		cout<<left<<setw(11)<<"line_num"<<setw(15)<< "电话号码" << setw(15) << "姓名" << endl;
 		for (auto it = condata.begin(); it != condata.end(); ++it) {
-			cout<< "contacter"<<contacter_cout++<< setw(15) <<it->number <<setw(15)<< it->name << endl;
+			cout<<left<<setw(9)<< "contacter"<<setw(2)<<contacter_cout++<< setw(15) <<it->number <<setw(15)<< it->name << endl;
 		}
 	}
 	else

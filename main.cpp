@@ -9,13 +9,22 @@ void put_data(fstream& push,vector<contac>& data);
 
 void push_data(fstream& put, vector<contac>& data);
 
+void ac_t_copy(ac_t& ac_state, ac_t& ac_state_copy)
+{
+	ac_state_copy.account_name = ac_state.account_name;
+	ac_state_copy.account_password = ac_state.account_password;
+	ac_state_copy.auto_login_state = ac_state.auto_login_state;
+	ac_state_copy.saving_password_state = ac_state.saving_password_state;
+}
+
 ac_t ac_state;
+ac_t ac_state_copy;
 
 int main() {
 
 	Logger error_write("log.txt");
 
-	cout << "welcome to this system" << setw(2) << system_name << version << endl;
+	cout << "welcome to this system: " << setw(2) << system_name<<"-v-" << version <<"  "<< coder << endl;
 
 	string account_state_file_path = "account_state.txt";
 
@@ -23,11 +32,11 @@ int main() {
 
 	if (account_state_file_check(account_state_file_path))
 	{
+		ac_s.seekg(0, ios::beg);//重置指针pos
+		ac_s >> ac_state.auto_login_state >> ac_state.saving_password_state >> ac_state.account_name >> ac_state.account_password;//载入状态
+		ac_t_copy(ac_state, ac_state_copy);
 		while (true)
 		{
-			ac_s.seekg(0, ios::beg);//重置指针pos
-			ac_s >>  ac_state.auto_login_state >> ac_state.saving_password_state >> ac_state.account_name >>ac_state.account_password;//载入状态
-
 			if (ac_state.auto_login_state)//如果是自动登录
 			{
 				cout << "自动登录成功" << endl;
@@ -113,7 +122,7 @@ int main() {
 		system("cls");
 	}
 
-	login_state_push(ac_state);
+	login_state_push(ac_state_copy);
 	file.close();
 	std::cerr.flush();
 	return 0;
@@ -138,7 +147,7 @@ void put_data(fstream& push,vector<contac>& data) {
 
 void push_data(fstream& put, vector<contac>& data) {
 	put.close();
-	put.open("contact_data.txt",ios::out | ios::in | ios::trunc);
+	put.open(ac_state.account_name + "contact_data.txt",ios::out | ios::in | ios::trunc);
 	if (data.size()) {
 		for (auto it = data.begin(); it != data.end(); ++it) {
 			put << it->number << it->name<<'\n';
